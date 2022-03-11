@@ -1,0 +1,33 @@
+version: '3'
+services:
+  nginx:
+    build:
+      context: ./docker/nginx/
+      dockerfile: Dockerfile
+    image: express-sample-nginx
+    container_name: express-sample-nginx
+    ports:
+      - 80:80
+    links:
+      - app
+    depends_on:
+      - app
+
+  # expressサーバ用コンテナ
+  app:
+    build:
+      context: ./docker/app/
+      dockerfile: Dockerfile
+    restart: always
+    image: express-sample-app
+    container_name: express-sample-app
+    volumes:
+      - .:/app
+      - /app/node_modules
+    expose:
+      - "3000"
+    working_dir: /app
+    tty: true
+    stdin_open: true
+    environment:
+      CHOKIDAR_USEPOLLING: 1 # マウントボリュームをnodemonがwatchするようにする(https://qiita.com/hoto17296/items/90f04fee8b70128ede190)
